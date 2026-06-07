@@ -14,7 +14,7 @@ def main():
 
     is_dragging = False
 
-    a_initial_x = 1
+    a_initial_x = -1
     a_initial_y = 1
 
     b_initial_x = 2
@@ -28,12 +28,19 @@ def main():
     
     label_b = ax.text(b_initial_x+0.5, b_initial_y+0.5, f"({b_initial_x:.2f}, {b_initial_y:.2f})", fontsize=10, color="blue")
 
-    x = [0, a_initial_x]
-    y = [0, a_initial_y]
+    a_xpoints = [0, a_initial_x]
+    a_ypoints = [0, a_initial_y]
 
-    ax.plot(x, y, color="firebrick", linestyle="-")
+    b_xpoints = [0, b_initial_x]
+    b_ypoints = [0, b_initial_y]
+
+    line_a, = ax.plot(a_xpoints, a_ypoints, color="firebrick", linestyle="-")
+    line_b, = ax.plot(b_xpoints, b_ypoints, color="blue", linestyle="-")
 
     def on_pick(event):
+        if event.inaxes != ax: 
+            return
+        
         nonlocal is_dragging
         ax, ay = point_a.get_data()
         bx, by = point_b.get_data()
@@ -55,11 +62,22 @@ def main():
             label_a.set_text(f"({new_x:.2f}, {new_y:.2f})")
             
             point_a.set_data([event.xdata], [event.ydata])
+
+            a_xpoints[1] = new_x
+            a_ypoints[1] = new_y
+
+            line_a.set_data([a_xpoints], [a_ypoints])
+
         else:
             label_b.set_position((new_x + 0.5, new_y + 0.5))
             label_b.set_text(f"({new_x:.2f}, {new_y:.2f})")
             
             point_b.set_data([event.xdata], [event.ydata])
+
+            b_xpoints[1] = new_x
+            b_ypoints[1] = new_y
+
+            line_b.set_data([b_xpoints], [b_ypoints])
 
 
         fig.canvas.draw_idle()
