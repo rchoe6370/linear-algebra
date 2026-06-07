@@ -12,39 +12,65 @@ def main():
 
     ax.locator_params(axis='both', nbins=5)
 
-    triangle = np.array([
-        [0, 2], 
-        [-1, 0], 
-        [1, 0], 
-        [0, 2]
-    ])
+    is_dragging = False
 
-    scale = np.array([
-        [2, 0], 
-        [0, 0.5]
-    ])
+    a_initial_x = 1
+    a_initial_y = 1
 
-    reflectY = np.array([
-        [1, 0],
-        [0, -1]
-    ])
+    b_initial_x = 2
+    b_initial_y = 2
 
-    rad = np.radians(90)
-    rotate = np.array([
-        [np.cos(rad), -np.sin(rad)],
-        [np.sin(rad), np.cos(rad)]
-    ])
+    point_a, = ax.plot(a_initial_x, a_initial_y, marker="o", color="firebrick", markersize=10, picker=True) 
+    
+    label_a = ax.text(a_initial_x+0.5, a_initial_y+0.5, f"({a_initial_x:.2f}, {a_initial_y:.2f})", fontsize=10, color="firebrick")
 
-    scaled = triangle @ scale
-    reflected = triangle @ reflectY
-    rotated = triangle @ rotate
+    point_b, = ax.plot(b_initial_x, b_initial_y, marker="o", color="blue", markersize=10, picker=True) 
+    
+    label_b = ax.text(b_initial_x+0.5, b_initial_y+0.5, f"({b_initial_x:.2f}, {b_initial_y:.2f})", fontsize=10, color="blue")
+
+    x = [0, a_initial_x]
+    y = [0, a_initial_y]
+
+    ax.plot(x, y, color="firebrick", linestyle="-")
+
+    def on_pick(event):
+        nonlocal is_dragging
+        ax, ay = point_a.get_data()
+        bx, by = point_b.get_data()
+
+        if abs(event.xdata - ax[0]) < 0.5 and abs(event.ydata - ay[0]  < 0.5):
+            is_dragging = "A"
+        elif abs(event.xdata - bx[0]) < 0.5 and abs(event.ydata - by[0]  < 0.5):
+            is_dragging = "B"
+    
+    def on_motion(event):
+        if not is_dragging or event.inaxes != ax:
+            return
+        
+        new_x = event.xdata
+        new_y = event.ydata
+
+        if (is_dragging == "A"):
+            label_a.set_position((new_x + 0.5, new_y + 0.5))
+            label_a.set_text(f"({new_x:.2f}, {new_y:.2f})")
+            
+            point_a.set_data([event.xdata], [event.ydata])
+        else:
+            label_b.set_position((new_x + 0.5, new_y + 0.5))
+            label_b.set_text(f"({new_x:.2f}, {new_y:.2f})")
+            
+            point_b.set_data([event.xdata], [event.ydata])
 
 
+        fig.canvas.draw_idle()
 
-    ax.plot(triangle[:, 0], triangle[:, 1], marker = 'o')
-    ax.plot(scaled[:, 0], scaled[:, 1])
-    ax.plot(reflected[:, 0], reflected[:, 1])
-    ax.plot(rotated[:, 0], rotated[:, 1])
+    def on_release(event):
+        nonlocal is_dragging
+        is_dragging = False
+    
+    fig.canvas.mpl_connect("button_press_event", on_pick)
+    fig.canvas.mpl_connect("motion_notify_event", on_motion)
+    fig.canvas.mpl_connect("button_release_event", on_release)
 
     plt.show()
 
