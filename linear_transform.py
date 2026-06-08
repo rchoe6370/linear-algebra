@@ -165,7 +165,16 @@ class VectorEngine:
         self.refresh()
 
     def on_release(self, event):
+        if self.dragging == "A":
+            self.vec_a = self.snap(self.vec_a)
+        elif self.dragging == "B":
+            self.vec_b = self.snap(self.vec_b)
+        
         self.dragging = None
+        self.refresh()
+    
+    def snap(self, vec):
+        return Vector(round(vec.x * 2) / 2, round(vec.y * 2) / 2)
 
     def connect_events(self):
         c = self.fig.canvas
