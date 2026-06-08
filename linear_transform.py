@@ -67,6 +67,15 @@ class ResultVector(DrawnVector):
             self.label_name.set_text(label_text)
             self.label_name.set_position((new_vector.x / 2 + 0.3, new_vector.y / 2 + 0.3))
 
+class DrawnConnector:
+    def __init__(self, ax, vec_from, vec_to, color="gray"):
+        self.vec_from = vec_from
+        self.vec_to = vec_to
+
+        self.line, = ax.plot([vec_from.vector.x, vec_to.vector.x], [vec_from.vector.y, vec_to.vector.y], color=color, linestyle="--", linewidth=1.2, alpha=0.6)
+    
+    def update(self):
+        self.line.set_data([self.vec_from.vector.x, self.vec_to.vector.x], [self.vec_from.vector.y, self.vec_to.vector.y])
 
 class VectorEngine:
     operations = ("Addition", "Subtraction", "Projection")
@@ -105,6 +114,10 @@ class VectorEngine:
         result_vec = self.vec_a + self.vec_b
         self.drawn_result = ResultVector(self.ax, result_vec, "A + B", "seagreen")
 
+        self.connector_a_result = DrawnConnector(self.ax, self.drawn_a, self.drawn_result)
+        self.connector_b_result = DrawnConnector(self.ax, self.drawn_b, self.drawn_result)
+
+
     def compute_result(self):
         if self.operation == "Addition":
             return self.vec_a + self.vec_b, "A + B"
@@ -120,6 +133,9 @@ class VectorEngine:
 
         result_vec, label = self.compute_result()
         self.drawn_result.update(result_vec, label)
+
+        self.connector_a_result.update()
+        self.connector_b_result.update()
 
         self.fig.canvas.draw_idle()
 
