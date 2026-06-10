@@ -125,7 +125,6 @@ class VectorEngine:
             return self.vec_a - self.vec_b, "A - B"
         elif self.operation == "Projection":
             return self.vec_a.project_onto(self.vec_b), "A onto B"
-        return self.vec_a + self.vec_b, "A + B"
 
     def refresh(self):
         self.drawn_a.update(self.vec_a)
@@ -177,10 +176,9 @@ class VectorEngine:
         return Vector(round(vec.x * 2) / 2, round(vec.y * 2) / 2)
 
     def connect_events(self):
-        c = self.fig.canvas
-        c.mpl_connect("button_press_event",  self.on_press)
-        c.mpl_connect("motion_notify_event", self.on_motion)
-        c.mpl_connect("button_release_event", self.on_release)
+        self.fig.canvas.mpl_connect("button_press_event",  self.on_press)
+        self.fig.canvas.mpl_connect("motion_notify_event", self.on_motion)
+        self.fig.canvas.mpl_connect("button_release_event", self.on_release)
 
     def run(self):
         plt.show()
