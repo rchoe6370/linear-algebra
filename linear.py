@@ -92,6 +92,8 @@ class VectorEngine:
         self.vec_b = Vector(2.0, 2.0)
         self.operation = "Addition"
         self.dragging = None
+        self.connectors = True
+        self.snap_to_grid = True
 
         self.build_figure()
         self.build_drawn_vectors()
@@ -104,6 +106,16 @@ class VectorEngine:
         self.operation = "Addition"
         self.radio.set_active(0)
         self.dragging = None
+        self.connectors = True
+        self.snap_to_grid = True
+
+        states = self.check.get_status()
+        if not states[0]:
+            self.check.set_active(0)
+        if not states[1]:
+            self.check.set_active(1)
+        
+        self.refresh()
 
 
     def build_figure(self):
@@ -118,13 +130,25 @@ class VectorEngine:
         self.ax.axvline(0, color="black", linewidth=0.6)
         self.ax.set_title("Vector Engine", fontsize=12)
 
-        ax_radio = self.fig.add_axes([0.02, 0.35, 0.20, 0.3])
+        ax_radio = self.fig.add_axes([0.02, 0.55, 0.2, 0.3])
         self.radio = RadioButtons(ax_radio, self.operations, active=0, activecolor="steelblue")
         self.radio.on_clicked(self.on_operation_change)
 
-        ax_button = self.fig.add_axes([0.08, 0.20, 0.08, 0.06])
+        ax_check = self.fig.add_axes([0.02, 0.3, 0.2, 0.15])
+        self.check = CheckButtons(ax_check, ['Connectors', 'Snap to Grid'], [True, True])
+        self.check.on_clicked(self.on_check)
+
+        #ax_button = self.fig.add_axes([0.08, 0.15, 0.08, 0.06])
+        ax_button = self.fig.add_axes([0.02, 0.15, 0.2, 0.08])
         self.button = Button(ax_button, "Reset", hovercolor="steelblue")
         self.button.on_clicked(self.reset)
+
+    def on_check(self, label):
+        states = self.check.get_status()
+        self.connectors = states[0]
+        self.snap_to_grid = states[1]
+        self.refresh()
+
     
     def build_drawn_vectors(self):
         self.drawn_a = DrawnVector(self.ax, self.vec_a, "A", "firebrick")
@@ -155,6 +179,9 @@ class VectorEngine:
         self.connector_a_result.update()
         self.connector_b_result.update()
 
+        self.connector_a_result.line.set_visible(self.connectors)
+        self.connector_b_result.line.set_visible(self.connectors)
+
         self.fig.canvas.draw_idle()
 
     def on_operation_change(self, label):
@@ -183,10 +210,11 @@ class VectorEngine:
         self.refresh()
 
     def on_release(self, event):
-        if self.dragging == "A":
-            self.vec_a = self.snap(self.vec_a)
-        elif self.dragging == "B":
-            self.vec_b = self.snap(self.vec_b)
+        if self.snap_to_grid == True:
+            if self.dragging == "A":
+                self.vec_a = self.snap(self.vec_a)
+            elif self.dragging == "B":
+                self.vec_b = self.snap(self.vec_b)
         
         self.dragging = None
         self.refresh()
