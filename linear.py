@@ -1,8 +1,3 @@
-# todo
-# angle between a and b 
-
-
-
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.widgets import RadioButtons, Button, CheckButtons
