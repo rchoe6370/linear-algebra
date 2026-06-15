@@ -1,6 +1,13 @@
+# todo
+# show/hide connectors 
+# angle between a and b 
+# snap toggle checkbox 
+
+
+
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.widgets import RadioButtons
+from matplotlib.widgets import RadioButtons, Button, CheckButtons
 import math
 
 class Vector:
@@ -91,6 +98,14 @@ class VectorEngine:
         self.connect_events()
         self.refresh()
 
+    def reset(self, event=None):
+        self.vec_a = Vector(-1.0, 1.0)
+        self.vec_b = Vector(2.0, 2.0)
+        self.operation = "Addition"
+        self.radio.set_active(0)
+        self.dragging = None
+
+
     def build_figure(self):
         self.fig = plt.figure(figsize=(7, 6))
 
@@ -103,9 +118,13 @@ class VectorEngine:
         self.ax.axvline(0, color="black", linewidth=0.6)
         self.ax.set_title("Vector Engine", fontsize=12)
 
-        ax_radio = self.fig.add_axes([0.02, 0.35, 0.22, 0.3])
+        ax_radio = self.fig.add_axes([0.02, 0.35, 0.20, 0.3])
         self.radio = RadioButtons(ax_radio, self.operations, active=0, activecolor="steelblue")
         self.radio.on_clicked(self.on_operation_change)
+
+        ax_button = self.fig.add_axes([0.08, 0.20, 0.08, 0.06])
+        self.button = Button(ax_button, "Reset", hovercolor="steelblue")
+        self.button.on_clicked(self.reset)
     
     def build_drawn_vectors(self):
         self.drawn_a = DrawnVector(self.ax, self.vec_a, "A", "firebrick")
