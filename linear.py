@@ -1,7 +1,5 @@
 # todo
-# show/hide connectors 
 # angle between a and b 
-# snap toggle checkbox 
 
 
 
